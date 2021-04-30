@@ -1,5 +1,5 @@
 {
-  "name": "MUNDO-Backend-API",
+  "name": "mundo-backend-api",
   "private": true,
   "version": "1.0.0",
   "description": "Data access layer and backend for MUNDO conference applications",
