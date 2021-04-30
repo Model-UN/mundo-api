@@ -1,8 +1,8 @@
 {
-  "name": "nest-typescript-starter",
+  "name": "MUNDO-Backend-API",
   "private": true,
   "version": "1.0.0",
-  "description": "Nest TypeScript starter repository",
+  "description": "Data access layer and backend for MUNDO conference applications",
   "license": "MIT",
   "scripts": {
     "prebuild": "rimraf dist",
