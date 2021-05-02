@@ -1,7 +1,7 @@
-import { AbstractBaseDTO } from './abstract-base.dto';
+import { AbstractBaseDto } from './abstract-base.dto';
 import { IsDate, IsNumber, IsString } from 'class-validator';
 
-export class ConferenceDto extends AbstractBaseDTO {
+export class ConferenceDto extends AbstractBaseDto {
   @IsString()
   name: string;
   @IsNumber()
