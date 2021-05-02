@@ -1,5 +1,5 @@
 import { AbstractBaseDto } from './abstract-base.dto';
-import { Roles } from '../common/enumerations/roles';
+import { Roles } from '../common/enumerations/roles.enum';
 import {
   IsArray,
   IsDate,
