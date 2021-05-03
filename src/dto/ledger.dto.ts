@@ -11,5 +11,5 @@ export class LedgerDto extends AbstractBaseDto {
   user: number;
   @IsString()
   @IsOptional()
-  description: string;
+  description?: string;
 }
