@@ -1,10 +1,10 @@
 import { AbstractBaseDto } from './abstract-base.dto';
-import { IsDate, IsNumber, IsString } from 'class-validator';
+import { IsDate, IsInt, IsString } from 'class-validator';
 
 export class ConferenceDto extends AbstractBaseDto {
   @IsString()
   name: string;
-  @IsNumber()
+  @IsInt()
   year: number;
   @IsDate()
   startDate: Date = new Date();
