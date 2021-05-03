@@ -1,6 +1,6 @@
 import { IsDate, IsInt } from 'class-validator';
 
-export class AbstractBaseDTO {
+export class AbstractBaseDto {
   @IsInt()
   id: number;
 

@@ -1,4 +1,4 @@
-import { AbstractBaseDTO } from './abstract-base.dto';
+import { AbstractBaseDto } from './abstract-base.dto';
 import {
   IsISO31661Alpha2,
   IsOptional,
@@ -7,7 +7,7 @@ import {
   Length,
 } from 'class-validator';
 
-export class SchoolDto extends AbstractBaseDTO {
+export class SchoolDto extends AbstractBaseDto {
   @IsString()
   schoolName: string;
   @IsString()
