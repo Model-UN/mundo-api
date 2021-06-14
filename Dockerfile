@@ -2,7 +2,7 @@
 
 FROM node:14.17.0
 
-ENV NODE_ENV=development
+ENV NODE_ENV=production
 ENV PORT=3000
 COPY ["package.json", "package-lock.json", "./"]
 
