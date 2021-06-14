@@ -6,7 +6,7 @@ services:
                         context: .
                 restart: always
                 ports:
-                        - 3000:3000
+                        - 80:80
                 environment:
                         PORT: 3000
                 healthcheck:
