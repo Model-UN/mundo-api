@@ -33,7 +33,7 @@ RUN npm install -g npm \
 FROM node:14.17.0
 
 ENV NODE_ENV production
-ENV PORT 80
+ENV PORT 3000
 
 EXPOSE $PORT
 
