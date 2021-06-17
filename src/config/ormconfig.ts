@@ -1,4 +1,5 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { EntityConfig } from '../repository/entity.config';
 
 export const typeormConfig: TypeOrmModuleOptions = {
   type: 'postgres',
@@ -7,6 +8,6 @@ export const typeormConfig: TypeOrmModuleOptions = {
   username: process.env.PG_USERNAME,
   password: process.env.PG_PASSWORD,
   database: process.env.PG_DATABASE,
-  entities: [],
+  entities: EntityConfig,
   synchronize: true,
 };
