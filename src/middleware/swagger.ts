@@ -1,8 +1,6 @@
-import { Injectable } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { NestFastifyApplication } from '@nestjs/platform-fastify';
 
-@Injectable()
 export class Swagger {
   /* Swagger Config
    * For more information on OpenAPI, fastify-swagger, @nestjs/swagger, refer to

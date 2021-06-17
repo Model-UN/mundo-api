@@ -3,7 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './resources/auth/auth.module';
-import { Swagger } from './swagger';
+import { Swagger } from './middleware/swagger';
 
 @Module({
   imports: [ConfigModule.forRoot(), AuthModule],

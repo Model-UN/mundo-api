@@ -4,7 +4,7 @@ import {
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
-import { Swagger } from './swagger';
+import { Swagger } from './middleware/swagger';
 
 async function bootstrap() {
   // Initialize Nest-Fastify app
