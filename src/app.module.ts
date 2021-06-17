@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './resources/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { typeormConfig } from './config/ormconfig';
+import { typeormConfig } from './entities/ormconfig';
 
 @Module({
   imports: [
