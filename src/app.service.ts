@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { AppHttpResponseDto } from './dto/app-http-response.dto';
 import { ProjectMetadataDto } from './dto/project-metadata.dto';
+import { healthCheckMessage } from './common/constants/project-metadata';
 
 @Injectable()
 export class AppService {
@@ -12,6 +13,6 @@ export class AppService {
 
   health(): AppHttpResponseDto {
     // Check health of API. This can return anything.
-    return new AppHttpResponseDto('Committee is now in session!');
+    return new AppHttpResponseDto(healthCheckMessage);
   }
 }

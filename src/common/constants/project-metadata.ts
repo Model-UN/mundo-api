@@ -27,3 +27,4 @@ export const collaborators = [
     'https://github.com/FReda',
   ],
 ];
+export const healthCheckMessage = 'Committee is now in session!';
