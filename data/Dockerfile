@@ -28,7 +28,7 @@ ENV POSTGRES_DB        ${PG_DATABASE}
 VOLUME /tmp
 
 # Copy bash script
-COPY ${PG_DATABASE}_dump.sql /tmp/${PG_DATABASE}_dump.sql
+COPY ${PG_DATABASE}_dump.dump /tmp/${PG_DATABASE}_dump.dump
 COPY restore-local-db.sh /docker-entrypoint-initdb.d/restore-local-db.sh
 # CRLF -> LF (DOS to Unix b/c Windows users)
 RUN sed -i 's/\r$//g' /docker-entrypoint-initdb.d/restore-local-db.sh
