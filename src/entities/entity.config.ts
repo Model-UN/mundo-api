@@ -1,3 +1,3 @@
-import { User } from '../resources/users/users/entities/user.entity';
+import { User } from './user.entity';
 
 export const EntityConfig = [User];
