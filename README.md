@@ -28,9 +28,32 @@
 
 ## Installation
 
+**Setup:**
+
 ```bash
+# Install dependencies
 $ npm install
+$ npm install -g @nestjs/cli
+
+# Create local dotenv file
+$ cp .env.sample .env  # Once created, modify values as needed.
 ```
+
+You should only have to modify the value for `PROD_PG_HOST` and `PG_PASSWORD`
+before cloning the remote db. You must have Docker installed to run this script.
+
+```bash
+# Dump remote database and restore to a local Postgres image.
+$ sudo ./data/run-local-db.sh
+```
+
+If you go this route, use the output IP in `nexus-postgres-local RUNNING ON <IP>`
+as your `PG_HOST`
+
+If you do not have credentials for the remote db, create a `localhost:5432`
+Postgres server and create the database `mundo_nexus_db` with `CREATE DATABASE
+mundo_nexus_db`. TypeORM should be able to handle table creation - mock data
+is up to you.
 
 ## Running the app
 
