@@ -1,3 +1,7 @@
+# Dev
+data/*.dump
+data/docker_logs
+
 # Build
 public/css/main.css
 
