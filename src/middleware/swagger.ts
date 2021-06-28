@@ -13,6 +13,7 @@ export class Swagger {
       .setVersion('1.0')
       .addTag('meta')
       .addTag('authentication')
+      .addTag('users')
       .build();
 
     const document = SwaggerModule.createDocument(app, config);
