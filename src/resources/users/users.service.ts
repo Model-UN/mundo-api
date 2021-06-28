@@ -20,6 +20,18 @@ export class UsersService {
     return this.usersRepository.findOne({ where: { id: +id, active: true } });
   }
 
+  async findByEmail(email: string, auth?: boolean): Promise<User> {
+    if (auth) {
+      return await this.usersRepository
+        .createQueryBuilder('user')
+        .where('active = true')
+        .andWhere('user.email = :email', { email })
+        .addSelect('user.password')
+        .getOne();
+    }
+    return this.usersRepository.findOne({ where: { email, active: true } });
+  }
+
   async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.active = true;
     const insertResult = await this.usersRepository.insert(createUserDto);
