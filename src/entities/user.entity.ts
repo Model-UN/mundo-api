@@ -21,12 +21,8 @@ export class User extends BaseEntity {
   password: string;
   @CreateDateColumn()
   createdOn: Date;
-  @Column()
-  createdBy: number;
   @UpdateDateColumn()
   updatedOn: Date;
-  @Column()
-  updatedBy: number;
   @Column()
   active: boolean;
 }

@@ -4,7 +4,7 @@ import { LocalAuthGuard } from './local-auth.guard';
 import { LoginDto } from './dto/login.dto';
 
 @ApiTags('auth')
-@Controller('auth')
+@Controller('api/v1/auth')
 export class AuthController {
   @UseGuards(LocalAuthGuard)
   @Post('login')
