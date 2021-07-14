@@ -35,7 +35,10 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.active = true;
-    createUserDto.password = await AuthService.hash(createUserDto.password);
+    createUserDto.password = await AuthService.handleValidatePassword(
+      createUserDto.password,
+    );
+    createUserDto.email = createUserDto.email.toLowerCase();
     const insertResult = await this.usersRepository.insert(createUserDto);
     return await this.usersRepository.findOne(insertResult.identifiers[0]);
   }
