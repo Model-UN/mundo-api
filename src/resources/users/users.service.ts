@@ -4,6 +4,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from '../../entities/user.entity';
 import { Repository, UpdateResult } from 'typeorm';
+import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
@@ -34,6 +35,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.active = true;
+    createUserDto.password = await AuthService.hash(createUserDto.password);
     const insertResult = await this.usersRepository.insert(createUserDto);
     return await this.usersRepository.findOne(insertResult.identifiers[0]);
   }
