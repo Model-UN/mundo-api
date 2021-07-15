@@ -5,7 +5,7 @@ import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './resources/auth/auth.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
-import { UsersModule } from './resources/users/users/users.module';
+import { UsersModule } from './resources/users/users.module';
 import { EntityConfig } from './entities/entity.config';
 import { SnakeNamingStrategy } from './entities/snakeNamingStrategy';
 
