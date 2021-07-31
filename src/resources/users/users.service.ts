@@ -53,14 +53,21 @@ export class UsersService {
    *
    * @param createUserDto
    */
-  async create(createUserDto: CreateUserDto): Promise<User> {
-    createUserDto.active = true;
+  async create(createUserDto: CreateUserDto) {
     createUserDto.password = await AuthService.handleValidatePassword(
       createUserDto.password,
     );
+    createUserDto.active = false;
     createUserDto.email = createUserDto.email.toLowerCase();
+    createUserDto.createdBy = 0;
+    createUserDto.updatedBy = 0;
     const insertResult = await this.usersRepository.insert(createUserDto);
-    return await this.usersRepository.findOne(insertResult.identifiers[0]);
+    const uid = insertResult.identifiers[0].id;
+    await this.usersRepository.update(uid, {
+      createdBy: uid,
+      updatedBy: uid,
+    });
+    return await this.usersRepository.findOne(uid);
   }
 
   async softDelete(id: string): Promise<UpdateResult> {

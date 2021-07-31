@@ -1,16 +1,25 @@
-import {
-  BadRequestException,
-  Injectable,
-  PreconditionFailedException,
-} from '@nestjs/common';
+import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import { User } from '../../entities/user.entity';
 
 import * as argon2 from 'argon2';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
-  constructor(private usersService: UsersService) {}
+  constructor(
+    private usersService: UsersService,
+    private jwtService: JwtService,
+  ) {}
+
+  async login(user: any) {
+    const payload = { email: user.email, id: user.id };
+    return {
+      accessToken: this.jwtService.sign(payload, {
+        secret: process.env.SECRET_KEY,
+      }),
+    };
+  }
 
   /**
    * Verify a user's login and password with the database. If good, return true,
@@ -20,7 +29,7 @@ export class AuthService {
    * @param pass
    * @return Promise<boolean>
    */
-  async validateUser(email: string, pass: string): Promise<boolean> {
+  async validateUser(email: string, pass: string): Promise<User> {
     // Case insensitive validation
     const userName = email.toLowerCase();
     // Get the user from the db
@@ -28,10 +37,12 @@ export class AuthService {
     // If the user exists
     if (user) {
       // Return password check result
-      return await AuthService.verifyPassword(user.password, pass);
+      return (await AuthService.verifyPassword(user.password, pass))
+        ? user
+        : null;
     }
     // Else, return false
-    return false;
+    return null;
   }
 
   /**

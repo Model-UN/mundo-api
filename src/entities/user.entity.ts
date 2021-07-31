@@ -1,28 +1,18 @@
-import {
-  CreateDateColumn,
-  UpdateDateColumn,
-  BaseEntity,
-  Column,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity } from 'typeorm';
+import { ApiBaseEntity } from './base.entity';
 
 @Entity()
-export class User extends BaseEntity {
-  @PrimaryGeneratedColumn()
-  id: number;
+export class User extends ApiBaseEntity {
   @Column()
   firstName: string;
   @Column()
   lastName: string;
+  @Column()
+  dateOfBirth: Date;
+  @Column()
+  phoneNumber?: string;
   @Column({ unique: true })
   email: string;
   @Column({ select: false })
   password: string;
-  @CreateDateColumn()
-  createdOn: Date;
-  @UpdateDateColumn()
-  updatedOn: Date;
-  @Column()
-  active: boolean;
 }

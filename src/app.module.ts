@@ -8,6 +8,7 @@ import { Connection } from 'typeorm';
 import { UsersModule } from './resources/users/users.module';
 import { EntityConfig } from './entities/entity.config';
 import { SnakeNamingStrategy } from './entities/snakeNamingStrategy';
+import { ConferencesModule } from './resources/conferences/conferences.module';
 
 @Module({
   imports: [
@@ -32,6 +33,7 @@ import { SnakeNamingStrategy } from './entities/snakeNamingStrategy';
     }),
     UsersModule,
     AuthModule,
+    ConferencesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
