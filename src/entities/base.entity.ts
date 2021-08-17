@@ -13,14 +13,14 @@ export class ApiBaseEntity extends BaseEntity {
   id: number;
   @Column()
   active: boolean;
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, (user) => user.id)
   @Column()
-  createdBy: number;
-  @ManyToOne(() => User)
+  createdBy?: number;
+  @ManyToOne(() => User, (user) => user.id)
   @Column()
-  updatedBy: number;
+  updatedBy?: number;
   @CreateDateColumn()
   createdOn: Date;
   @UpdateDateColumn()
-  updatedOn: Date;
+  updatedOn?: Date;
 }

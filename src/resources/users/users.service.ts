@@ -52,22 +52,16 @@ export class UsersService {
    * If the user's email already exists, then the user will not be created.
    *
    * @param createUserDto
+   * @returns Promise<User>
    */
-  async create(createUserDto: CreateUserDto) {
+  async create(createUserDto: CreateUserDto): Promise<User> {
     createUserDto.password = await AuthService.handleValidatePassword(
       createUserDto.password,
     );
     createUserDto.active = false;
     createUserDto.email = createUserDto.email.toLowerCase();
-    createUserDto.createdBy = 0;
-    createUserDto.updatedBy = 0;
     const insertResult = await this.usersRepository.insert(createUserDto);
-    const uid = insertResult.identifiers[0].id;
-    await this.usersRepository.update(uid, {
-      createdBy: uid,
-      updatedBy: uid,
-    });
-    return await this.usersRepository.findOne(uid);
+    return await this.usersRepository.findOne(insertResult.identifiers[0]);
   }
 
   async softDelete(id: string): Promise<UpdateResult> {
@@ -75,7 +69,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    const updateResult = await this.usersRepository.update(+id, updateUserDto);
-    return await this.usersRepository.findOne(updateResult.affected[0]);
+    await this.usersRepository.update(+id, updateUserDto);
+    return await this.usersRepository.findOne(+id);
   }
 }
