@@ -1,15 +1,25 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { FormsService } from './forms.service';
 import { CreateFormDto } from './dto/create-form.dto';
 import { UpdateFormDto } from './dto/update-form.dto';
+import { ApiTags } from '@nestjs/swagger';
 
-@Controller('forms')
+@ApiTags('forms')
+@Controller('conferences/:conferenceId/forms')
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 
   @Post()
-  create(@Body() createFormDto: CreateFormDto) {
-    return this.formsService.create(createFormDto);
+  create(@Param(':conferenceId') confId, @Body() createFormDto: CreateFormDto) {
+    return this.formsService.create(+confId, createFormDto);
   }
 
   @Get()

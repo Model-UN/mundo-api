@@ -6,17 +6,17 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { User } from './user.entity';
+import { Users } from './users.entity';
 
 export class ApiBaseEntity extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
   @Column()
   active: boolean;
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => Users, (user) => user.id)
   @Column()
   createdBy?: number;
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => Users, (user) => user.id)
   @Column()
   updatedBy?: number;
   @CreateDateColumn()

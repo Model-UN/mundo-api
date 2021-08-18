@@ -2,7 +2,7 @@ import { Column, Entity } from 'typeorm';
 import { ApiBaseEntity } from './base.entity';
 
 @Entity()
-export class Conference extends ApiBaseEntity {
+export class Conferences extends ApiBaseEntity {
   @Column()
   active: boolean;
 

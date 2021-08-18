@@ -9,9 +9,9 @@ import {
 } from 'typeorm';
 
 @Entity()
-export class User extends BaseEntity {
+export class Users extends BaseEntity {
   @PrimaryGeneratedColumn()
-  id;
+  id: number;
   @Column()
   firstName: string;
   @Column()
@@ -26,7 +26,7 @@ export class User extends BaseEntity {
   password: string;
   @Column()
   active: boolean;
-  @ManyToOne(() => User, (user) => user.id)
+  @ManyToOne(() => Users, (user) => user.id)
   @Column({ nullable: true })
   updatedBy?: number;
   @CreateDateColumn()

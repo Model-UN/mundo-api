@@ -1,13 +1,6 @@
 import { AbstractBaseDto } from './abstract-base.dto';
-import { Roles } from '../common/enumerations/roles.enum';
-import {
-  IsArray,
-  IsDate,
-  IsEmail,
-  IsEnum,
-  IsHash,
-  IsString,
-} from 'class-validator';
+import { IsArray, IsDate, IsEmail, IsHash, IsString } from 'class-validator';
+import { UserRolesEnum } from '../common/enumerations/userRoles.enum';
 
 export class UserBaseDto extends AbstractBaseDto {
   @IsString()
@@ -20,8 +13,8 @@ export class UserBaseDto extends AbstractBaseDto {
   password: string;
   @IsDate()
   date_of_birth: Date = new Date();
-  @IsEnum(Roles)
-  role: Roles;
   @IsArray()
-  conferences: Array<number>;
+  roles: UserRolesEnum[];
+  @IsArray()
+  conferences: number[];
 }

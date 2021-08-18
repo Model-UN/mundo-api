@@ -4,9 +4,7 @@ import { UpdateFormDto } from './dto/update-form.dto';
 
 @Injectable()
 export class FormsService {
-  create(createFormDto: CreateFormDto) {
-    return 'This action adds a new form';
-  }
+  create(confId: number, createFormDto: CreateFormDto) {}
 
   findAll() {
     return `This action returns all forms`;

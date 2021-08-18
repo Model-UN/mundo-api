@@ -1,6 +1,6 @@
 import { Injectable, PreconditionFailedException } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { User } from '../../entities/user.entity';
+import { Users } from '../../entities/users.entity';
 
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
@@ -29,11 +29,11 @@ export class AuthService {
    * @param pass
    * @return Promise<boolean>
    */
-  async validateUser(email: string, pass: string): Promise<User> {
+  async validateUser(email: string, pass: string): Promise<Users> {
     // Case insensitive validation
     const userName = email.toLowerCase();
     // Get the user from the db
-    const user: User = await this.usersService.findByEmail(userName, true);
+    const user: Users = await this.usersService.findByEmail(userName, true);
     // If the user exists
     if (user) {
       // Return password check result
@@ -73,16 +73,14 @@ export class AuthService {
   }
 
   /**
-   * Determine if string contains at least one lowercase, uppercase, numeric,
-   * and special character and is 8-120 (inclusive) in length.
+   * Sort of check if the password is a SHA-256 hash.
    *
    * @param pass
    * @returns boolean
    */
   static checkSecurePassword(pass: string): boolean {
-    const re =
-      /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?[0-9])(?=.*?[!"#$%&'()*+,-.\/:;<=>?@[\r^_`{|}~])[a-zA-Z0-9!"#$%&'()*+,-.\/:;<=>?@[\]^_`{|}~]{8,120}$/;
-    return !!re.exec(pass);
+    const isHash = /^[a-f0-9]{64}$/gi;
+    return isHash.test(pass);
   }
 
   /**

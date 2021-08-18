@@ -2,22 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from '../../entities/user.entity';
+import { Users } from '../../entities/users.entity';
 import { Repository, UpdateResult } from 'typeorm';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
+    @InjectRepository(Users)
+    private usersRepository: Repository<Users>,
   ) {}
 
-  findAll(): Promise<User[]> {
+  findAll(): Promise<Users[]> {
     return this.usersRepository.find({ where: { active: true } });
   }
 
-  findOne(id: string): Promise<User> {
+  findOne(id: string): Promise<Users> {
     return this.usersRepository.findOne({ where: { id: +id, active: true } });
   }
 
@@ -29,10 +29,10 @@ export class UsersService {
    * with.
    * @param {boolean} auth Optional argument to return a password with the user
    * object. For auth purposes only.
-   * @returns {Promise<User>} User object containing password if auth, else
+   * @returns {Promise<Users>} User object containing password if auth, else
    * will not.
    */
-  async findByEmail(email: string, auth?: boolean): Promise<User> {
+  async findByEmail(email: string, auth?: boolean): Promise<Users> {
     if (auth) {
       return await this.usersRepository
         .createQueryBuilder('user')
@@ -52,9 +52,9 @@ export class UsersService {
    * If the user's email already exists, then the user will not be created.
    *
    * @param createUserDto
-   * @returns Promise<User>
+   * @returns Promise<Users>
    */
-  async create(createUserDto: CreateUserDto): Promise<User> {
+  async create(createUserDto: CreateUserDto): Promise<Users> {
     createUserDto.password = await AuthService.handleValidatePassword(
       createUserDto.password,
     );

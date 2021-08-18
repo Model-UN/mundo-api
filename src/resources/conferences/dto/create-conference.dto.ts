@@ -3,6 +3,8 @@ import { IsDate, IsString } from 'class-validator';
 
 export class CreateConferenceDto {
   active: boolean;
+  createdBy: number;
+  updatedBy: number;
 
   @ApiProperty()
   @IsString()
