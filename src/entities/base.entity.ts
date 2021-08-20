@@ -14,10 +14,10 @@ export class ApiBaseEntity extends BaseEntity {
   @Column()
   active: boolean;
   @ManyToOne(() => Users, (user) => user.id)
-  @Column()
+  @Column({ nullable: true })
   createdBy?: number;
   @ManyToOne(() => Users, (user) => user.id)
-  @Column()
+  @Column({ nullable: true })
   updatedBy?: number;
   @CreateDateColumn()
   createdOn: Date;

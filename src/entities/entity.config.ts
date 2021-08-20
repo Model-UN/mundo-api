@@ -6,6 +6,8 @@ import { FormFields } from './formFields.entity';
 import { Forms } from './forms.entity';
 import { FormSections } from './formSections.entity';
 import { UserRoles } from './userRoles.entity';
+import { FormSubmissions } from './formSubmissions.entity';
+import { FormFieldResponses } from './formFieldResponses.entity';
 
 export const EntityConfig = [
   Conferences,
@@ -16,4 +18,6 @@ export const EntityConfig = [
   FormSections,
   Users,
   UserRoles,
+  FormSubmissions,
+  FormFieldResponses,
 ];
