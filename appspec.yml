@@ -2,7 +2,7 @@ version: 0.0
 os: linux
 files:
         - source: .
-          destination: /home/ec2-user/mundo-backend/
+          destination: /home/ubuntu/mundo-backend/
 hooks:
         AfterInstall:
                 - location: setup.sh
