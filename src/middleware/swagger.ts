@@ -11,6 +11,7 @@ export class Swagger {
       .setTitle('MUNDO Conference API')
       .setDescription('REST-ful data access layer for MUNDO Conferences.')
       .setVersion('1.0')
+      .addBearerAuth()
       .build();
 
     const document = SwaggerModule.createDocument(app, config);

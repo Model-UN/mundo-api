@@ -1,0 +1,11 @@
+export enum FieldTypes {
+  SHORT_ANSWER,
+  EMAIL,
+  TELEPHONE,
+  POSTAL_CODE,
+  DATE,
+  LONG_ANSWER,
+  SELECTION,
+  MULTIPLE_SELECTION,
+  RANK,
+}

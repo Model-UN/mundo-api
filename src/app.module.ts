@@ -7,7 +7,9 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { Connection } from 'typeorm';
 import { UsersModule } from './resources/users/users.module';
 import { EntityConfig } from './entities/entity.config';
-import { SnakeNamingStrategy } from './entities/snakeNamingStrategy';
+import { SnakeNamingStrategy } from './middleware/snakeNamingStrategy';
+import { ConferencesModule } from './resources/conferences/conferences.module';
+import { FormsModule } from './resources/forms/forms.module';
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { SnakeNamingStrategy } from './entities/snakeNamingStrategy';
     }),
     UsersModule,
     AuthModule,
+    ConferencesModule,
+    FormsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
