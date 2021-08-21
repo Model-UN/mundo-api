@@ -14,6 +14,8 @@ async function bootstrap() {
   );
 
   Swagger.configure(app);
+  // enable CORS
+  app.enableCors();
   // Set listener at localhost:$PORT
   await app.listen(process.env.PORT, '0.0.0.0');
 }
