@@ -5,6 +5,7 @@ import {
 } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { Swagger } from './middleware/swagger';
+import { fastifyHelmet } from 'fastify-helmet';
 
 async function bootstrap() {
   // Initialize Nest-Fastify app
@@ -16,6 +17,7 @@ async function bootstrap() {
   Swagger.configure(app);
   // enable CORS
   app.enableCors();
+  await app.register(fastifyHelmet);
   // Set listener at localhost:$PORT
   await app.listen(process.env.PORT, '0.0.0.0');
 }
