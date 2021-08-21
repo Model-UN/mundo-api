@@ -11,9 +11,17 @@ import { FormSubmissions } from '../../../entities/formSubmissions.entity';
 import { UsersService } from '../../users/users.service';
 import { FieldTypes } from '../../../common/enumerations/fieldTypes.enum';
 import { is_zip_code } from '../../../common/utils';
-import { isEmail, isPhoneNumber } from 'class-validator';
+import { isEmail, isPhoneNumber, validate } from 'class-validator';
 import { FormFieldResponseDto } from '../dto/form-field-response.dto';
 import { FormFieldResponses } from '../../../entities/formFieldResponses.entity';
+import { MultipleSelectionDto } from '../dto/fieldResponseValidators/multiple-selection.dto';
+import { ShortAnswerDto } from '../dto/fieldResponseValidators/short-answer.dto';
+import { EmailDto } from '../dto/fieldResponseValidators/email.dto';
+import { TelephoneDto } from '../dto/fieldResponseValidators/telephone.dto';
+import { PostalCodeDto } from '../dto/fieldResponseValidators/postal-code.dto';
+import { DateDto } from '../dto/fieldResponseValidators/date.dto';
+import { LongAnswerDto } from '../dto/fieldResponseValidators/long-answer.dto';
+import { SelectionDto } from '../dto/fieldResponseValidators/selection.dto';
 
 @Injectable()
 export class SubmissionsService {
@@ -51,15 +59,15 @@ export class SubmissionsService {
     submitFormDto: SubmitFormDto,
     register?: string,
   ) {
-    // const form = await this.formService.findOne(formId);
-    // if (SubmissionsService.validateForm(form, submitFormD
-    const submissionInsertResult = await this.createNewSubmission(formId);
-    const submissionId = submissionInsertResult.identifiers[0].id;
-    return await this.handleSubmitResponses(
-      submissionId,
-      submitFormDto.responses,
-    );
-    // }
+    const form = await this.formService.findOne(formId);
+    if (SubmissionsService.validateForm(form, submitFormDto)) {
+      const submissionInsertResult = await this.createNewSubmission(formId);
+      const submissionId = submissionInsertResult.identifiers[0].id;
+      return await this.handleSubmitResponses(
+        submissionId,
+        submitFormDto.responses,
+      );
+    }
   }
 
   async handleSubmitResponses(
@@ -95,139 +103,50 @@ export class SubmissionsService {
     submitFormDto: SubmitFormDto,
   ): boolean {
     // Create data maps for forms
-    const formFieldIds = [];
+
     const formFields = {};
     const formRequiredFieldIds = [];
-    const formFieldTypeMap = {};
+
     for (const section of form.sections) {
       for (const field of section.fields) {
-        formFieldIds.push(field.id);
         formFields[field.id] = field;
-        formFieldTypeMap[field.id] = field.fieldType;
+
         if (field.required) {
           formRequiredFieldIds.push(field.id);
         }
       }
     }
-    console.log(formFieldIds);
-    console.log(formRequiredFieldIds);
-    console.log(formFieldTypeMap);
-
-    // Create data map for type to fieldType
-    // annoying, but enum name cannot be used here.
-    // #TODO refactor this to use enum name somehow / bring to enum level
-    const responseTypeFieldTypeMap = {
-      SHORT_ANSWER: 'string',
-      EMAIL: 'string',
-      TELEPHONE: 'string',
-      POSTAL_CODE: 'string',
-      DATE: '[object Date]',
-      LONG_ANSWER: 'string',
-      SELECTION: 'number',
-      MULTIPLE_SELECTION: '[object Array]',
-      RANK: '[object Array]',
-    };
-    console.log(responseTypeFieldTypeMap);
 
     // Create data map for response ids
+
     const responseFieldIds = [];
-    const invalidFieldTypes = [];
     const badFields = [];
+
     for (const response of submitFormDto.responses) {
-      const responseId = response.id;
       responseFieldIds.push(response.id);
       console.log(formFields[response.id].fieldType);
       const fieldType = formFields[response.id].fieldType;
 
-      // Check data type of response matches with accepted fieldType
-      if (
-        typeof response.response !== responseTypeFieldTypeMap[fieldType] &&
-        Object.prototype.toString.call(response.response) !==
-          responseTypeFieldTypeMap[fieldType]
-      ) {
-        invalidFieldTypes.push({
-          id: responseId,
-          content: formFields[response.id].content,
-          fieldType: formFields[response.id].fieldType,
-          expected: responseTypeFieldTypeMap[fieldType],
-          received:
-            typeof response.response === 'object'
-              ? Object.prototype.toString.call(response.response)
-              : typeof response.response,
-        });
-      }
+      // Map fieldType with validator dto
 
-      // Additional validation by fieldType
-      switch (fieldType) {
-        case 'EMAIL':
-          if (!isEmail(response.response)) {
-            badFields.push({
-              field: formFields[response.id],
-              error: `${response.response} is not a valid email.`,
-            });
-          }
-          break;
-        case 'SHORT_ANSWER':
-          if (response.response.length > 120) {
-            badFields.push({
-              received: response.response,
-              fieldId: response.id,
-              fieldType: formFields[response.id].fieldType,
-              content: formFields[response.id].content,
-              error: `Short answer field response must contain fewer than 120 characters.`,
-            });
-          }
-          break;
-        case 'TELEPHONE':
-          if (!isPhoneNumber(response.response)) {
-            badFields.push({
-              received: response.response,
-              fieldId: response.id,
-              fieldType: formFields[response.id].fieldType,
-              content: formFields[response.id].content,
-              error: `Phone number is not valid.`,
-            });
-          }
-          break;
-        case 'LONG_ANSWER':
-          if (response.response.length > 9999) {
-            badFields.push({
-              received: response.response,
-              fieldId: response.id,
-              fieldType: formFields[response.id].fieldType,
-              content: formFields[response.id].content,
-              error: `Paragraph field response must contain fewer than 10,000 characters.`,
-            });
-          }
-          break;
-        case 'POSTAL_CODE':
-          if (!is_zip_code(response.response)) {
-            badFields.push({
-              received: response.response,
-              fieldId: response.id,
-              fieldType: formFields[response.id].fieldType,
-              content: formFields[response.id].content,
-              error: `Zip/Postal Code is invalid.`,
-            });
-          }
-          break;
-        case 'RANK':
-        case 'MULTIPLE_SELECTION':
-        case 'SELECTION':
-        case 'DATE':
-          break;
-        default:
-          badFields.push({
-            received: response.response,
-            fieldId: response.id,
-            fieldType: formFields[response.id].fieldType,
-            content: formFields[response.id].content,
-            error: `Field does not contain proper field type.`,
-          });
-          break;
-      }
+      const clsFieldTypeMap = {
+        SHORT_ANSWER: ShortAnswerDto,
+        EMAIL: EmailDto,
+        TELEPHONE: TelephoneDto,
+        POSTAL_CODE: PostalCodeDto,
+        DATE: DateDto,
+        LONG_ANSWER: LongAnswerDto,
+        SELECTION: SelectionDto,
+        MULTIPLE_SELECTION: MultipleSelectionDto,
+      };
+
+      // "cast" DTOs to their field type
+
+      const processed = new clsFieldTypeMap[fieldType]();
+      processed.id = response.id;
+      processed.response = response.response;
+      validate(processed).then((errors) => console.log(errors));
     }
-    console.log(invalidFieldTypes);
 
     // Check required fields are all filled out
     console.log(responseFieldIds);
@@ -236,12 +155,11 @@ export class SubmissionsService {
     );
     console.log(missingRequiredFields);
 
-    if (missingRequiredFields || badFields || invalidFieldTypes) {
+    if (missingRequiredFields || badFields) {
       throw new PreconditionFailedException({
         error: 'Bad or missing fields found.',
-        missingRequiredFields,
+        missing: missingRequiredFields,
         badFields,
-        invalidFieldTypes,
       });
     }
     return true;
