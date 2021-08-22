@@ -22,6 +22,7 @@ import { PostalCodeDto } from '../dto/fieldResponseValidators/postal-code.dto';
 import { DateDto } from '../dto/fieldResponseValidators/date.dto';
 import { LongAnswerDto } from '../dto/fieldResponseValidators/long-answer.dto';
 import { SelectionDto } from '../dto/fieldResponseValidators/selection.dto';
+import { RankDto } from '../dto/fieldResponseValidators/rank.dto';
 
 @Injectable()
 export class SubmissionsService {
@@ -60,14 +61,13 @@ export class SubmissionsService {
     register?: string,
   ) {
     const form = await this.formService.findOne(formId);
-    if (SubmissionsService.validateForm(form, submitFormDto)) {
-      const submissionInsertResult = await this.createNewSubmission(formId);
-      const submissionId = submissionInsertResult.identifiers[0].id;
-      return await this.handleSubmitResponses(
-        submissionId,
-        submitFormDto.responses,
-      );
-    }
+    submitFormDto = await SubmissionsService.normalizeForm(form, submitFormDto);
+    const submissionInsertResult = await this.createNewSubmission(formId);
+    const submissionId = submissionInsertResult.identifiers[0].id;
+    return await this.handleSubmitResponses(
+      submissionId,
+      submitFormDto.responses,
+    );
   }
 
   async handleSubmitResponses(
@@ -98,10 +98,13 @@ export class SubmissionsService {
     return await this.submissionRepository.insert(submission);
   }
 
-  private static validateForm(
+  private static async normalizeForm(
     form: Forms,
     submitFormDto: SubmitFormDto,
-  ): boolean {
+  ) {
+    const outputSubmitFormDto = new SubmitFormDto();
+    outputSubmitFormDto.responses = [];
+
     // Create data maps for forms
 
     const formFields = {};
@@ -120,11 +123,10 @@ export class SubmissionsService {
     // Create data map for response ids
 
     const responseFieldIds = [];
-    const badFields = [];
+    const validationErrors = [];
 
     for (const response of submitFormDto.responses) {
       responseFieldIds.push(response.id);
-      console.log(formFields[response.id].fieldType);
       const fieldType = formFields[response.id].fieldType;
 
       // Map fieldType with validator dto
@@ -138,30 +140,36 @@ export class SubmissionsService {
         LONG_ANSWER: LongAnswerDto,
         SELECTION: SelectionDto,
         MULTIPLE_SELECTION: MultipleSelectionDto,
+        RANK: RankDto,
       };
 
       // "cast" DTOs to their field type
 
-      const processed = new clsFieldTypeMap[fieldType]();
-      processed.id = response.id;
-      processed.response = response.response;
-      validate(processed).then((errors) => console.log(errors));
+      const normalized = new clsFieldTypeMap[fieldType]();
+      normalized.id = response.id;
+      normalized.response = response.response;
+      if (fieldType === 'DATE') {
+        normalized.response = new Date(response.response);
+      }
+      outputSubmitFormDto.responses.push(normalized);
+      const error = await validate(normalized);
+      if (error.length) {
+        validationErrors.push(error);
+      }
     }
 
     // Check required fields are all filled out
-    console.log(responseFieldIds);
     const missingRequiredFields = formRequiredFieldIds.filter(
       (id) => !responseFieldIds.includes(id),
     );
-    console.log(missingRequiredFields);
 
-    if (missingRequiredFields || badFields) {
+    if (missingRequiredFields.length || validationErrors.length) {
       throw new PreconditionFailedException({
         error: 'Bad or missing fields found.',
         missing: missingRequiredFields,
-        badFields,
+        validationErrors,
       });
     }
-    return true;
+    return outputSubmitFormDto;
   }
 }

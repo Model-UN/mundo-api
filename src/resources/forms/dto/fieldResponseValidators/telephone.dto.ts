@@ -3,6 +3,5 @@ import { FormFieldResponseDto } from '../form-field-response.dto';
 
 export class TelephoneDto extends FormFieldResponseDto {
   @IsString()
-  @IsPhoneNumber()
   response: string;
 }
