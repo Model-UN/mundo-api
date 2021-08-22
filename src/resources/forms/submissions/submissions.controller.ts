@@ -4,7 +4,7 @@ import { SubmissionsService } from './submissions.service';
 import { SubmitFormDto } from '../dto/submit-form.dto';
 
 @ApiTags('formSubmissions')
-@Controller('conferences/:conferenceId/forms/:formId/submissions')
+@Controller('api/conferences/:conferenceId/forms/:formId/submissions')
 export class SubmissionsController {
   constructor(private readonly submissionsService: SubmissionsService) {}
 

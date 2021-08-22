@@ -16,7 +16,7 @@ import { ApiBearerAuth, ApiParam, ApiTags } from '@nestjs/swagger';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 
 @ApiTags('forms')
-@Controller('conferences/:conferenceId/forms')
+@Controller('api/conferences/:conferenceId/forms')
 export class FormsController {
   constructor(private readonly formsService: FormsService) {}
 

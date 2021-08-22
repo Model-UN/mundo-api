@@ -4,7 +4,7 @@ import { AppService } from './app.service';
 import { AppHttpResponseDto } from './dto/app-http-response.dto';
 
 @ApiTags('meta')
-@Controller()
+@Controller('')
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
@@ -15,7 +15,7 @@ export class AppController {
     return this.appService.metadata();
   }
 
-  @Get('health')
+  @Get('api/health')
   @ApiOperation({ summary: "Test a GET request to make sure we're live" })
   @ApiResponse({ status: 200, description: 'It works!' })
   getHealth(): AppHttpResponseDto {
