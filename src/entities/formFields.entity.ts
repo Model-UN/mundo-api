@@ -6,6 +6,8 @@ import { FormSections } from './formSections.entity';
 
 @Entity()
 export class FormFields extends ApiBaseEntity {
+  @Column({ nullable: true })
+  index?: number;
   @ManyToOne(() => FormSections, (section) => section.id)
   @Column()
   sectionId: number;
