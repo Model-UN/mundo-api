@@ -9,9 +9,7 @@ import { FormsService } from '../forms.service';
 import { SubmitFormDto } from '../dto/submit-form.dto';
 import { FormSubmissions } from '../../../entities/formSubmissions.entity';
 import { UsersService } from '../../users/users.service';
-import { FieldTypes } from '../../../common/enumerations/fieldTypes.enum';
-import { is_zip_code } from '../../../common/utils';
-import { isEmail, isPhoneNumber, validate } from 'class-validator';
+import { validate } from 'class-validator';
 import { FormFieldResponseDto } from '../dto/form-field-response.dto';
 import { FormFieldResponses } from '../../../entities/formFieldResponses.entity';
 import { MultipleSelectionDto } from '../dto/fieldResponseValidators/multiple-selection.dto';
@@ -23,6 +21,8 @@ import { DateDto } from '../dto/fieldResponseValidators/date.dto';
 import { LongAnswerDto } from '../dto/fieldResponseValidators/long-answer.dto';
 import { SelectionDto } from '../dto/fieldResponseValidators/selection.dto';
 import { RankDto } from '../dto/fieldResponseValidators/rank.dto';
+import { SubmissionGetDto } from '../dto/submission-get.dto';
+import { FieldTypes } from '../../../common/enumerations/fieldTypes.enum';
 
 @Injectable()
 export class SubmissionsService {
@@ -44,6 +44,108 @@ export class SubmissionsService {
   ) {}
 
   /**
+   * Retrieve a single submission based on its conference, form, and submission IDs
+   *
+   * @param confId
+   * @param formId
+   * @param submissionId
+   */
+  async fetchOne(confId, formId, submissionId) {}
+
+  /**
+   * Retrieve all submissions corresponding to a formId with a confId
+   * @param confId
+   * @param formId
+   */
+  async fetchAll(confId, formId) {
+    // Get all submission IDs corresponding to formId
+    const submissionIdsQuery: FormSubmissions[] =
+      await this.submissionRepository.find({
+        select: ['id'],
+        where: { formId },
+      });
+
+    // Extracted array of just the form's respective submission IDs
+    const submissionIds = submissionIdsQuery.map((submission) => submission.id);
+
+    // Create map for fieldValues
+    const fieldValues = new Map();
+
+    // Get all field values and IDs
+    const fieldValuesQuery: FieldResponseValues[] =
+      await this.fieldValueRepository.find({
+        select: ['id', 'value'],
+      });
+
+    // Set id-value key-pairs in fieldValues
+    fieldValuesQuery.map((fieldValue) => {
+      fieldValues.set(fieldValue.id, fieldValue.value);
+    });
+
+    // All responses corresponding to the submission id
+    const responses = await this.responsesRepository.query(
+      `
+        SELECT submission_id, content, response, field_type FROM form_field_responses
+        INNER JOIN form_fields ff on ff.id = form_field_responses.field_id_id
+        WHERE array_position($1, submission_id) > 0
+        ORDER BY index
+        `,
+      [submissionIds],
+    );
+
+    /**
+     * This is fun, lots of fun Map and .map tricks.
+     */
+
+    /**
+     * Because responses come in as an array of objects, each representing a
+     * row, a map must be used before the final response can be generated, where
+     * the key is the submissionId, and the value is an object of responses for
+     * each field.
+     */
+    const submissions = new Map();
+
+    submissionIds.map((id) => {
+      const responsesObj = {};
+
+      responses.map((response) => {
+        if (response.submission_id === id) {
+          // Value of the response to the content
+          let val = response.response[0];
+
+          // FieldType for the response's field
+          const fieldType = response.field_type;
+
+          switch (fieldType) {
+            case 'SELECTION':
+              val = fieldValues.get(+val);
+              break;
+            case 'MULTIPLE_SELECTION':
+            case 'RANK':
+              val = val.map((id) => fieldValues.get(+id));
+              break;
+          }
+
+          responsesObj[`${response.content}`] = val;
+        }
+      });
+
+      submissions.set(id, responsesObj);
+    });
+
+    const output = [];
+
+    for (const submissionIter of submissions) {
+      if (Object.keys(submissionIter[1]).length > 1) {
+        submissionIter[1]['id'] = submissionIter[0];
+        output.push(submissionIter[1]);
+      }
+    }
+
+    return output;
+  }
+
+  /**
    * Handles the submission of responses for a new form. Should first validate
    * that the form responses are complete and acceptable for their respective
    * field. Then, should insert a new FormSubmissions object, followed by the
@@ -52,14 +154,8 @@ export class SubmissionsService {
    * @param confId
    * @param formId
    * @param submitFormDto
-   * @param register
    */
-  async handleSubmit(
-    confId,
-    formId,
-    submitFormDto: SubmitFormDto,
-    register?: string,
-  ) {
+  async handleSubmit(confId, formId, submitFormDto: SubmitFormDto) {
     const form = await this.formService.findOne(formId);
     submitFormDto = await SubmissionsService.normalizeForm(form, submitFormDto);
     const submissionInsertResult = await this.createNewSubmission(formId);
@@ -70,6 +166,11 @@ export class SubmissionsService {
     );
   }
 
+  /**
+   *
+   * @param submissionId
+   * @param formFieldResponses
+   */
   async handleSubmitResponses(
     submissionId: number,
     formFieldResponses: FormFieldResponseDto[],
@@ -91,6 +192,10 @@ export class SubmissionsService {
     return output;
   }
 
+  /**
+   *
+   * @param formId
+   */
   async createNewSubmission(formId: number): Promise<InsertResult> {
     const submission = new FormSubmissions();
     submission.formId = formId;
@@ -98,6 +203,12 @@ export class SubmissionsService {
     return await this.submissionRepository.insert(submission);
   }
 
+  /**
+   *
+   * @param form
+   * @param submitFormDto
+   * @private
+   */
   private static async normalizeForm(
     form: Forms,
     submitFormDto: SubmitFormDto,
