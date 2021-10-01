@@ -94,20 +94,16 @@ export class SubmissionsService {
     );
 
     /**
-     * This is fun, lots of fun Map and .map tricks.
+     * All of this just to generate the output below
      */
 
-    /**
-     * Because responses come in as an array of objects, each representing a
-     * row, a map must be used before the final response can be generated, where
-     * the key is the submissionId, and the value is an object of responses for
-     * each field.
-     */
-    const submissions = new Map();
+    const output = [];
 
+    // Cheeky way to iterate through the submission ids
     submissionIds.map((id) => {
-      const responsesObj = {};
+      const responsesObj = { id };
 
+      // for each submission id, we want all the corresponding responses so:
       responses.map((response) => {
         if (response.submission_id === id) {
           // Value of the response to the content
@@ -116,6 +112,7 @@ export class SubmissionsService {
           // FieldType for the response's field
           const fieldType = response.field_type;
 
+          // Transform the data containing ids as needed:
           switch (fieldType) {
             case 'SELECTION':
               val = fieldValues.get(+val);
@@ -126,21 +123,16 @@ export class SubmissionsService {
               break;
           }
 
+          // Set response data into responsesObj
           responsesObj[`${response.content}`] = val;
         }
       });
 
-      submissions.set(id, responsesObj);
-    });
-
-    const output = [];
-
-    for (const submissionIter of submissions) {
-      if (Object.keys(submissionIter[1]).length > 1) {
-        submissionIter[1]['id'] = submissionIter[0];
-        output.push(submissionIter[1]);
+      // If the object has values other than "id", add to output array
+      if (Object.keys(responsesObj).length > 1) {
+        output.push(responsesObj);
       }
-    }
+    });
 
     return output;
   }
