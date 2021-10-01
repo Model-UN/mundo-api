@@ -128,7 +128,7 @@ export class SubmissionsService {
         }
       });
 
-      // If the object has values other than "id", add to output array
+      // If the object has values other than just "id", add to output array
       if (Object.keys(responsesObj).length > 1) {
         output.push(responsesObj);
       }
