@@ -21,8 +21,6 @@ import { DateDto } from '../dto/fieldResponseValidators/date.dto';
 import { LongAnswerDto } from '../dto/fieldResponseValidators/long-answer.dto';
 import { SelectionDto } from '../dto/fieldResponseValidators/selection.dto';
 import { RankDto } from '../dto/fieldResponseValidators/rank.dto';
-import { SubmissionGetDto } from '../dto/submission-get.dto';
-import { FieldTypes } from '../../../common/enumerations/fieldTypes.enum';
 
 @Injectable()
 export class SubmissionsService {
@@ -50,7 +48,33 @@ export class SubmissionsService {
    * @param formId
    * @param submissionId
    */
-  async fetchOne(confId, formId, submissionId) {}
+  async fetchOne(confId, formId, submissionId) {
+    // Get map of fieldValues
+    const fieldValues = await this.getFieldValues();
+
+    // Get responses based on submission ids
+    const responses = await this.responsesRepository.query(
+      `
+        SELECT submission_id, content, response, field_type FROM form_field_responses
+        INNER JOIN form_fields ff on ff.id = form_field_responses.field_id_id
+        WHERE submission_id = $1
+        ORDER BY index
+        `,
+      [submissionId],
+    );
+
+    const output = { id: submissionId };
+
+    responses.map((response) => {
+      // Set response data into responsesObj
+      output[`${response.content}`] = this.getResponseValues(
+        response,
+        fieldValues,
+      );
+    });
+
+    return output;
+  }
 
   /**
    * Retrieve all submissions corresponding to a formId with a confId
@@ -68,19 +92,8 @@ export class SubmissionsService {
     // Extracted array of just the form's respective submission IDs
     const submissionIds = submissionIdsQuery.map((submission) => submission.id);
 
-    // Create map for fieldValues
-    const fieldValues = new Map();
-
-    // Get all field values and IDs
-    const fieldValuesQuery: FieldResponseValues[] =
-      await this.fieldValueRepository.find({
-        select: ['id', 'value'],
-      });
-
-    // Set id-value key-pairs in fieldValues
-    fieldValuesQuery.map((fieldValue) => {
-      fieldValues.set(fieldValue.id, fieldValue.value);
-    });
+    // Get map of fieldValues
+    const fieldValues = await this.getFieldValues();
 
     // All responses corresponding to the submission id
     const responses = await this.responsesRepository.query(
@@ -106,25 +119,11 @@ export class SubmissionsService {
       // for each submission id, we want all the corresponding responses so:
       responses.map((response) => {
         if (response.submission_id === id) {
-          // Value of the response to the content
-          let val = response.response[0];
-
-          // FieldType for the response's field
-          const fieldType = response.field_type;
-
-          // Transform the data containing ids as needed:
-          switch (fieldType) {
-            case 'SELECTION':
-              val = fieldValues.get(+val);
-              break;
-            case 'MULTIPLE_SELECTION':
-            case 'RANK':
-              val = val.map((id) => fieldValues.get(+id));
-              break;
-          }
-
           // Set response data into responsesObj
-          responsesObj[`${response.content}`] = val;
+          responsesObj[`${response.content}`] = this.getResponseValues(
+            response,
+            fieldValues,
+          );
         }
       });
 
@@ -182,6 +181,44 @@ export class SubmissionsService {
       where: { submissionId },
     });
     return output;
+  }
+
+  private async getFieldValues() {
+    // Create map for fieldValues
+    const fieldValues = new Map();
+
+    // Get all field values and IDs
+    const fieldValuesQuery: FieldResponseValues[] =
+      await this.fieldValueRepository.find({
+        select: ['id', 'value'],
+      });
+
+    // Set id-value key-pairs in fieldValues
+    fieldValuesQuery.map((fieldValue) => {
+      fieldValues.set(fieldValue.id, fieldValue.value);
+    });
+
+    return fieldValues;
+  }
+
+  private getResponseValues(response, fieldValues) {
+    // Value of the response to the content
+    let val = response.response[0];
+
+    // FieldType for the response's field
+    const fieldType = response.field_type;
+
+    // Transform the data containing ids as needed:
+    switch (fieldType) {
+      case 'SELECTION':
+        val = fieldValues.get(+val);
+        break;
+      case 'MULTIPLE_SELECTION':
+      case 'RANK':
+        val = val.map((id) => fieldValues.get(+id));
+        break;
+    }
+    return val;
   }
 
   /**
