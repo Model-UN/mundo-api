@@ -49,6 +49,7 @@ export class SubmissionsService {
    * @param submissionId
    */
   async fetchOne(confId, formId, submissionId) {
+    // TODO: Verify conference with confId has a form of formId with submissions of submissionId
     // Get map of fieldValues
     const fieldValues = await this.getFieldValues();
 
@@ -82,6 +83,7 @@ export class SubmissionsService {
    * @param formId
    */
   async fetchAll(confId, formId) {
+    // TODO: Verify conference with confId has a form of formId
     // Get all submission IDs corresponding to formId
     const submissionIdsQuery: FormSubmissions[] =
       await this.submissionRepository.find({
