@@ -13,7 +13,7 @@ import { SubmitFormDto } from '../dto/submit-form.dto';
 import { JwtAuthGuard } from '../../auth/jwt-auth.guard';
 
 @ApiTags('formSubmissions')
-@Controller('conferences/:conferenceId/forms/:formId/submissions')
+@Controller('api/conferences/:conferenceId/forms/:formId/submissions')
 export class SubmissionsController {
   constructor(private readonly submissionsService: SubmissionsService) {}
 

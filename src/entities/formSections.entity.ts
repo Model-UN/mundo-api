@@ -2,7 +2,6 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { ApiBaseEntity } from './base.entity';
 import { Forms } from './forms.entity';
 import { FormFields } from './formFields.entity';
-import { IsArray } from 'class-validator';
 
 @Entity()
 export class FormSections extends ApiBaseEntity {

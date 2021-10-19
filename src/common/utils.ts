@@ -1,5 +1,3 @@
-import { IsPhoneNumber } from 'class-validator';
-
 /**
  * Small utility function to check if a postal code is in a valid format.
  *
